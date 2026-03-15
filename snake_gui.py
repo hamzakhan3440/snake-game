@@ -24,7 +24,7 @@ GRID_W       = 20          # Grid columns
 GRID_H       = 20          # Grid rows
 CANVAS_W     = CELL_SIZE * GRID_W
 CANVAS_H     = CELL_SIZE * GRID_H
-INITIAL_DELAY = 150        # Milliseconds between ticks (lower = faster)
+INITIAL_DELAY = 140        # Milliseconds between ticks (lower = faster)
 SPEED_INCREMENT = 3        # Ms to reduce delay per food eaten
 MIN_DELAY    = 60          # Fastest possible speed
 
