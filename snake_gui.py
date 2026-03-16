@@ -1,24 +1,8 @@
-"""
-snake_gui.py - Snake Game with TKinter GUI
-==========================================
-A fully playable Snake game with graphical interface.
-
-Controls:
-    Arrow keys  - Move the snake
-    R           - Restart after game over
-    Q / Escape  - Quit
-
-Run with:
-    python snake_gui.py
-"""
-
 import tkinter as tk
 import random
 from score import load_high_score, save_high_score, calculate_score
 
-# ---------------------------------------------------------------------------
 # Game configuration constants
-# ---------------------------------------------------------------------------
 CELL_SIZE    = 28          # Pixels per grid cell
 GRID_W       = 20          # Grid columns
 GRID_H       = 20          # Grid rows
@@ -49,12 +33,8 @@ RIGHT = ( 1,  0)
 OPPOSITE = {UP: DOWN, DOWN: UP, LEFT: RIGHT, RIGHT: LEFT}
 
 
-# ---------------------------------------------------------------------------
 # Main application class
-# ---------------------------------------------------------------------------
-
 class SnakeGame(tk.Tk):
-    """Root Tk window that hosts the entire Snake game."""
 
     def __init__(self) -> None:
         super().__init__()
@@ -69,12 +49,8 @@ class SnakeGame(tk.Tk):
         self._init_game()
         self._tick()
 
-    # ------------------------------------------------------------------
     # UI construction
-    # ------------------------------------------------------------------
-
     def _build_ui(self) -> None:
-        """Create all widgets."""
         # Score bar
         score_bar = tk.Frame(self, bg=SCORE_BG, pady=6)
         score_bar.pack(fill='x')
@@ -103,12 +79,9 @@ class SnakeGame(tk.Tk):
                  text='Arrow keys: move   R: restart   Q / Esc: quit',
                  font=('Segoe UI', 8), bg='#0a0a1a', fg='#555577').pack()
 
-    # ------------------------------------------------------------------
-    # Game initialisation
-    # ------------------------------------------------------------------
 
+    # Game initialisation
     def _init_game(self) -> None:
-        """Reset all game state for a new game."""
         mid_x = GRID_W // 2
         mid_y = GRID_H // 2
         # Snake starts as 3 segments moving right
@@ -122,25 +95,20 @@ class SnakeGame(tk.Tk):
         self._after_id = None
 
     def _place_food(self) -> tuple[int, int]:
-        """Return a random grid position not occupied by the snake."""
         while True:
             pos = (random.randint(0, GRID_W - 1), random.randint(0, GRID_H - 1))
             if pos not in self.snake:
                 return pos
 
-    # ------------------------------------------------------------------
-    # Game loop
-    # ------------------------------------------------------------------
 
+    # Game loop
     def _tick(self) -> None:
-        """Advance the game by one frame."""
         if self.alive:
             self._update()
         self._draw()
         self._after_id = self.after(self.delay, self._tick)
 
     def _update(self) -> None:
-        """Update game state: move snake, check collisions, handle food."""
         # Apply direction (cannot reverse)
         if self.next_dir != OPPOSITE.get(self.direction):
             self.direction = self.next_dir
@@ -173,18 +141,14 @@ class SnakeGame(tk.Tk):
             self.delay = max(MIN_DELAY, self.delay - SPEED_INCREMENT)
 
     def _game_over(self) -> None:
-        """Handle end-of-game: save high score, show overlay."""
         self.alive = False
         score = calculate_score(len(self.snake))
         save_high_score(score)
         self.high_var.set(f'Best: {load_high_score()}')
 
-    # ------------------------------------------------------------------
-    # Rendering
-    # ------------------------------------------------------------------
 
+    # Rendering
     def _draw(self) -> None:
-        """Redraw the entire canvas."""
         self.canvas.delete('all')
         self._draw_grid()
         self._draw_food()
@@ -193,14 +157,12 @@ class SnakeGame(tk.Tk):
             self._draw_game_over_overlay()
 
     def _draw_grid(self) -> None:
-        """Draw faint grid lines."""
         for x in range(0, CANVAS_W, CELL_SIZE):
             self.canvas.create_line(x, 0, x, CANVAS_H, fill=GRID_COLOUR)
         for y in range(0, CANVAS_H, CELL_SIZE):
             self.canvas.create_line(0, y, CANVAS_W, y, fill=GRID_COLOUR)
 
     def _draw_snake(self) -> None:
-        """Draw every segment of the snake."""
         for i, (cx, cy) in enumerate(self.snake):
             x1 = cx * CELL_SIZE + 2
             y1 = cy * CELL_SIZE + 2
@@ -216,12 +178,6 @@ class SnakeGame(tk.Tk):
                 self._draw_eyes(cx, cy)
 
     def _draw_eyes(self, cx: int, cy: int) -> None:
-        """Draw two small eyes on the snake's head.
-
-        Args:
-            cx: Grid column of the head.
-            cy: Grid row of the head.
-        """
         base_x = cx * CELL_SIZE
         base_y = cy * CELL_SIZE
         size = 4
@@ -237,7 +193,7 @@ class SnakeGame(tk.Tk):
                                     fill=BG_COLOUR, outline='')
 
     def _draw_food(self) -> None:
-        """Draw the food as a circle."""
+
         fx, fy = self.food
         x1 = fx * CELL_SIZE + 4
         y1 = fy * CELL_SIZE + 4
@@ -247,7 +203,7 @@ class SnakeGame(tk.Tk):
                                 fill=FOOD_COLOUR, outline='#ff4444', width=1)
 
     def _draw_game_over_overlay(self) -> None:
-        """Draw a semi-transparent game-over overlay with instructions."""
+        
         # Dim overlay
         self.canvas.create_rectangle(
             0, 0, CANVAS_W, CANVAS_H,
@@ -271,16 +227,9 @@ class SnakeGame(tk.Tk):
             fill='#a0b4c8',
         )
 
-    # ------------------------------------------------------------------
+
     # Input handling
-    # ------------------------------------------------------------------
-
     def _on_key(self, event: tk.Event) -> None:
-        """Handle keyboard input.
-
-        Args:
-            event: Tkinter key event.
-        """
         key = event.keysym
         direction_map = {
             'Up': UP, 'Down': DOWN, 'Left': LEFT, 'Right': RIGHT,
@@ -296,12 +245,9 @@ class SnakeGame(tk.Tk):
         elif key in ('q', 'Escape'):
             self.destroy()
 
-    # ------------------------------------------------------------------
-    # Utility
-    # ------------------------------------------------------------------
 
+    # Utility
     def _centre_window(self) -> None:
-        """Centre the window on screen."""
         self.update_idletasks()
         w = self.winfo_reqwidth()
         h = self.winfo_reqheight()
@@ -310,10 +256,8 @@ class SnakeGame(tk.Tk):
         self.geometry(f'+{x}+{y}')
 
 
-# ---------------------------------------------------------------------------
-# Entry point
-# ---------------------------------------------------------------------------
 
+# Entry point
 if __name__ == '__main__':
     app = SnakeGame()
     app.mainloop()
